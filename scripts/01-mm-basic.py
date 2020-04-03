@@ -66,5 +66,5 @@ layout = row(
     column(vmax_slider, km_slider),
 )
 
-output_file(html_output_dir + "01-mm-basic.html")
+output_file(html_output_dir + "01-mm-basic.html", title="Michaelis-Menten Kinetics")
 show(layout)
