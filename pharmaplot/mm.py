@@ -28,14 +28,37 @@ def michaelis_menten(substrate: np.ndarray, vmax: float, km: float) -> float:
     return initial_velocity
 
 
-def lineweaver_burk(substrate: float, vmax: float, km: float) -> float:
+def mm_competitive(substrate: np.ndarray, vmax: float = 1., km: float = 5., ki: float = 5., conc_i: float = 5) -> float:
+    """
+    calculate initial velocity based on substrate for competitive inhibitors
+    """
+    return (vmax * substrate)/((km*(1+(conc_i/ki))) + substrate)
+
+
+def mm_noncompetitive(substrate: np.ndarray, vmax: float = 1., km: float = 5., ki: float = 5.,
+                      conc_i: float = 5) -> float:
+    """
+    calculate initial velocity based on substrate for noncompetitive inhibitors
+    """
+    return (vmax * substrate)/((km*(1+(conc_i/ki))) + (substrate*(1+(conc_i/ki))))
+
+
+def mm_uncompetitive(substrate: np.ndarray, vmax: float = 1., km: float = 5., ki: float = 5.,
+                     conc_i: float = 5.) -> float:
+    """
+    calculate initial velocity based on substrate for uncompetitive inhibitors
+    """
+    return (vmax * substrate)/(km + (substrate*(1+(conc_i/ki))))
+
+
+def lineweaver_burk(inverse_substrate: np.ndarray, vmax: float, km: float) -> float:
     """
     calculates inverse of initial velocity according to Lineweaver-Burk trasnformation of the Micahelis-Menten eq.
 
     Parameters
     ----------
-    substrate: float
-        substrate concentration
+    inverse_substrate: float
+        inverse substrate concentration (1/[S])
 
     vmax: float
         maximum velocity
@@ -48,5 +71,5 @@ def lineweaver_burk(substrate: float, vmax: float, km: float) -> float:
     inverse_initial_velocity: float
         1/v0, the inverse of the initial velocity
     """
-    inverse_initial_velocity = (km / vmax) * (1 / substrate) + (1 / vmax)
+    inverse_initial_velocity = ((km / vmax) * inverse_substrate) + (1 / vmax)
     return inverse_initial_velocity
