@@ -73,3 +73,27 @@ def lineweaver_burk(inverse_substrate: np.ndarray, vmax: float, km: float) -> fl
     """
     inverse_initial_velocity = ((km / vmax) * inverse_substrate) + (1 / vmax)
     return inverse_initial_velocity
+
+
+def lwb_competitive(inverse_substrate: float, vmax: float = 1., km: float = 5.,
+                    ki: float = 5., conc_i: float = 5) -> float:
+    """
+    calculate 1/v0 based on substrate for competitive inhibitors
+    """
+    return ((km*(1+(conc_i/ki)))/vmax)*inverse_substrate+(1/vmax)
+
+
+def lwb_noncompetitive(inverse_substrate: float, vmax: float = 1., km: float = 5.,
+                       ki: float = 5., conc_i: float = 5) -> float:
+    """
+    calculate 1/v0 based on substrate for noncompetitive inhibitors
+    """
+    return (km/vmax)*((1+(conc_i/ki))* inverse_substrate)+((1+(conc_i/ki))/vmax)
+
+
+def lwb_uncompetitive(inverse_substrate: float, vmax: float = 1., km: float = 5.,
+                      ki: float = 5., conc_i: float = 5) -> float:
+    """
+    calculate 1/v0 based on substrate for uncompetitive inhibitors
+    """
+    return (km/vmax)*inverse_substrate +((1+(conc_i/ki))/vmax)

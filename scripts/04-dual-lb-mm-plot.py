@@ -51,7 +51,7 @@ mm_plot.circle('x', 'y', source=mm_point_source, size=10, color='black')
 mm_plot.line(x_line, y_line, line_width=5, color='blue', line_alpha=0.3)
 mm_plot.circle(x_points, y_points, size=10, color='blue', line_alpha=0.3)
 
-mytext = Label(x=50, y=70, text='Km = 10 (μM), Vmax = 100 (μM/s)',
+mytext = Label(x=3.8, y=10, text='Km = 1 (μM), Vmax = 10 (μM/s)',
                text_color="blue", text_alpha=0.5)
 mm_plot.add_layout(mytext)
 
@@ -90,7 +90,7 @@ lb_plot.renderers.extend([vline, hline])
 lb_plot.line(x_line, y_line, line_width=5, color='blue', line_alpha=0.3)
 lb_plot.circle(x_points, y_points, size=10, color='blue', line_alpha=0.3)
 
-mytext = Label(x=0.3, y=0.4, text='Km = 1 (μM), Vmax = 10 (μM/s)',
+mytext = Label(x=-0.1, y=0.4, text='Km = 1 (μM), Vmax = 10 (μM/s)',
                text_color="blue", text_alpha=0.5)
 lb_plot.add_layout(mytext)
 
@@ -98,7 +98,7 @@ lb_plot.add_layout(mytext)
 # make plot interactive
 # -------------------------------------------------
 # set up java script callback function to make plot interactive
-vmax_slider = Slider(start=0, end=20, value=10, step=0.1, title="Vmax (μM/s)")
+vmax_slider = Slider(start=1, end=20, value=10, step=0.1, title="Vmax (μM/s)")
 km_slider = Slider(start=0.1, end=10, value=1, step=0.1, title="Km (μM)")
 
 callback = CustomJS(args=dict(mmLineSource=mm_line_source,
@@ -114,29 +114,42 @@ callback = CustomJS(args=dict(mmLineSource=mm_line_source,
     const lbPointData = lbPointSource.data;
     const VMAX = vmax.value;
     const KM = km.value;
-    const mmlx = mmLineData['x']
-    const mmly = mmLineData['y']
-    const mmpx = mmPointData['x']
-    const mmpy = mmPointData['y']
-    const lblx = lbLineData['x']
-    const lbly = lbLineData['y']
-    const lbpx = lbPointData['x']
-    const lbpy = lbPointData['y']
+    const mmlx = mmLineData['x'];
+    const mmly = mmLineData['y'];
+    const mmpx = mmPointData['x'];
+    const mmpy = mmPointData['y'];
+    const lblx = lbLineData['x'];
+    const lbly = lbLineData['y'];
+    const lbpx = lbPointData['x'];
+    const lbpy = lbPointData['y'];
+    
+    // define functions for plotting data
+    function mm(x, VMAX, KM){
+        return (VMAX*x)/(KM+x);
+    }
+    
+    function lb(x, VMAX, KM){
+        return ((KM/VMAX)*x) + (1/VMAX);
+    }
+    
+    // loop over data to edit
     for (var i = 0; i < mmlx.length; i++) {
-        mmly[i] = (VMAX*mmlx[i])/(KM+mmlx[i]);
+        mmly[i] = mm(mmlx[i], VMAX, KM);
     }
-    mmLineSource.change.emit();
     for (var i = 0; i < mmpx.length; i++) {
-        mmpy[i] = (VMAX*mmpx[i])/(KM+mmpx[i]);
+        mmpy[i] = mm(mmpx[i], VMAX, KM);
     }
-    mmPointSource.change.emit();
     for (var i = 0; i < lblx.length; i++) {
-        lbly[i] = ((KM/VMAX)*lblx[i]) + (1/VMAX);
+        lbly[i] = lb(lblx[i], VMAX, KM);
     }
-    lbLineSource.change.emit();
     for (var i = 0; i < lbpx.length; i++) {
-        lbpy[i] = ((KM/VMAX)*lbpx[i]) + (1/VMAX);
+        lbpy[i] = lb(lbpx[i], VMAX, KM);
     }
+    
+    // change data sources
+    mmLineSource.change.emit();
+    mmPointSource.change.emit();
+    lbLineSource.change.emit();
     lbPointSource.change.emit();
 """)
 
